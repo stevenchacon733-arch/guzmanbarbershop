@@ -71,6 +71,18 @@ Vercel creará automáticamente un nuevo deployment con los cambios.
 
 Actualmente esta demo usa `localStorage`. Eso significa que las citas se guardan solamente en el navegador donde fueron creadas.
 
+## Notificaciones por WhatsApp
+
+La reserva llama a `/api/notify`, que usa WhatsApp Cloud API desde el servidor. En Vercel configura estas variables privadas:
+
+```env
+WHATSAPP_ACCESS_TOKEN=token_de_meta
+WHATSAPP_PHONE_NUMBER_ID=id_del_numero_de_whatsapp
+WHATSAPP_OWNER_PHONE=506XXXXXXXX
+```
+
+El número debe estar en formato internacional, sin `+`, espacios ni guiones. Crea una app de WhatsApp Business en Meta, agrega el número de prueba o producción y copia su token permanente y Phone Number ID. Sin estas variables, la reserva se guarda localmente pero no se envía ninguna notificación.
+
 Para producción hay que conectar una base de datos central (recomendado: Supabase) para que:
 
 - una cita creada por un cliente aparezca en el panel del dueño;
