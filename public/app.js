@@ -118,7 +118,7 @@ function showDashboard(){ $('#adminLogin').classList.add('hidden');$('#adminDash
 function logoutAdmin(){sessionStorage.removeItem('ng_admin');$('#adminDashboard').classList.add('hidden');$('#adminLogin').classList.remove('hidden');$('#adminPassword').value=''}
 
 function initAdmin(){
-  $('#adminOpenBtn').onclick=openAdmin; $$('[data-close-admin]').forEach(x=>x.onclick=closeAdmin);
+  const adminOpen=$('#adminOpenBtn'); if(adminOpen)adminOpen.onclick=openAdmin; $$('[data-close-admin]').forEach(x=>x.onclick=closeAdmin);
   $('#adminLoginBtn').onclick=()=>{if($('#adminPassword').value==='barber2026'){ $('#loginError').textContent='';showDashboard(); }else $('#loginError').textContent='Contraseña incorrecta.'};
   $('#adminPassword').addEventListener('keydown',e=>{if(e.key==='Enter')$('#adminLoginBtn').click()}); $('#adminLogoutBtn').onclick=logoutAdmin;
   $$('.admin-tab').forEach(tab=>tab.onclick=()=>{$$('.admin-tab').forEach(x=>x.classList.remove('active'));tab.classList.add('active');$$('.admin-pane').forEach(x=>x.classList.remove('active'));$(`#pane-${tab.dataset.tab}`).classList.add('active');if(tab.dataset.tab==='appointments')renderAppointments();if(tab.dataset.tab==='team')renderStaffDay();if(tab.dataset.tab==='hours'){renderWeeklyHours();renderExceptions();}});
