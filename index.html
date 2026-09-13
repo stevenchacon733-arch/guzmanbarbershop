@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0c0a08" />
+  <title>NOIR & GOLD Barbershop | Reservas</title>
+  <meta name="description" content="Sistema premium de reservas para barbería con agenda por barbero y panel administrativo." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="site-header" id="inicio">
+    <a class="brand" href="#inicio" aria-label="Inicio">
+      <span class="brand-mark">N&G</span>
+      <span class="brand-copy"><b>NOIR & GOLD</b><small>BARBERSHOP</small></span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+    <nav class="nav" id="mainNav">
+      <a href="#servicios">Servicios</a>
+      <a href="#equipo">Barberos</a>
+      <a href="#booking">Reservar</a>
+      <button class="nav-admin" id="adminOpenBtn">Panel dueño</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-copy reveal">
+        <span class="eyebrow">BARBERÍA · ESTILO · PRECISIÓN</span>
+        <h1>Tu mejor corte empieza con una <em>buena reserva.</em></h1>
+        <p>Agenda en segundos, elige tu barbero y llega directo a tu silla. Sin llamadas, sin filas, sin confusiones.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#booking">Agendar cita</a>
+          <a class="btn ghost" href="#servicios">Ver servicios</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong>4.9</strong><span>valoración</span></div>
+          <div><strong>15 min</strong><span>intervalos</span></div>
+          <div><strong>100%</strong><span>agenda online</span></div>
+        </div>
+      </div>
+      <div class="hero-card reveal delay-1">
+        <div class="hero-card-top"><span>HOY</span><span class="status-dot">Abierto</span></div>
+        <div class="monogram">NG</div>
+        <h3>Reserva inteligente</h3>
+        <p>El sistema solo muestra horarios reales según disponibilidad del equipo y duración del servicio.</p>
+        <div class="mini-slots">
+          <span>10:00</span><span>11:15</span><span>14:30</span><span>16:45</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="ticker" aria-hidden="true"><div>FADE · BEARD · CLASSIC CUT · HOT TOWEL · PRECISION · STYLE · </div></section>
+
+    <section class="section" id="servicios">
+      <div class="section-heading reveal">
+        <span class="eyebrow">SERVICIOS</span>
+        <h2>La experiencia, <em>a tu medida.</em></h2>
+        <p>Los servicios y precios pueden editarse después desde el código o conectarse a una base de datos.</p>
+      </div>
+      <div class="service-grid" id="serviceGrid"></div>
+    </section>
+
+    <section class="section dark-panel" id="equipo">
+      <div class="section-heading reveal">
+        <span class="eyebrow">EL EQUIPO</span>
+        <h2>Escoge quién define <em>tu estilo.</em></h2>
+      </div>
+      <div class="barber-grid" id="barberGrid"></div>
+    </section>
+
+    <section class="section booking-section" id="booking">
+      <div class="section-heading reveal">
+        <span class="eyebrow">RESERVA ONLINE</span>
+        <h2>Tu silla en <em>4 pasos.</em></h2>
+        <p>Selecciona servicio, fecha, barbero y hora. La agenda bloquea automáticamente espacios ocupados.</p>
+      </div>
+
+      <div class="booking-shell reveal">
+        <aside class="booking-progress">
+          <div class="progress-step active" data-step="1"><span>01</span><div><b>Servicio</b><small>Qué quieres hacerte</small></div></div>
+          <div class="progress-step" data-step="2"><span>02</span><div><b>Fecha</b><small>Cuándo quieres venir</small></div></div>
+          <div class="progress-step" data-step="3"><span>03</span><div><b>Profesional</b><small>Quién te atiende</small></div></div>
+          <div class="progress-step" data-step="4"><span>04</span><div><b>Hora y datos</b><small>Confirmación final</small></div></div>
+        </aside>
+
+        <div class="booking-content">
+          <div class="booking-step active" id="step1">
+            <div class="step-title"><span>Paso 1</span><h3>Selecciona un servicio</h3></div>
+            <div class="choice-grid" id="bookingServices"></div>
+          </div>
+
+          <div class="booking-step" id="step2">
+            <div class="step-title"><span>Paso 2</span><h3>Elige la fecha</h3></div>
+            <div class="date-strip" id="dateStrip"></div>
+            <div class="special-note" id="specialHoursNote"></div>
+            <div class="booking-actions"><button class="btn ghost small back-btn" data-back="1">Atrás</button></div>
+          </div>
+
+          <div class="booking-step" id="step3">
+            <div class="step-title"><span>Paso 3</span><h3>Elige tu barbero</h3></div>
+            <div class="choice-grid" id="bookingBarbers"></div>
+            <div class="booking-actions"><button class="btn ghost small back-btn" data-back="2">Atrás</button></div>
+          </div>
+
+          <div class="booking-step" id="step4">
+            <div class="step-title"><span>Paso 4</span><h3>Hora y tus datos</h3></div>
+            <div class="slots" id="timeSlots"></div>
+            <form id="bookingForm" class="booking-form">
+              <div class="field"><label>Nombre completo</label><input id="clientName" required placeholder="Ej. Daniel Mora" /></div>
+              <div class="field"><label>WhatsApp / teléfono</label><input id="clientPhone" required inputmode="tel" placeholder="8888-8888" /></div>
+              <div class="field"><label>Correo <span>(opcional)</span></label><input id="clientEmail" type="email" placeholder="correo@ejemplo.com" /></div>
+              <div class="field full"><label>Nota <span>(opcional)</span></label><textarea id="clientNote" rows="3" placeholder="Ej. Prefiero fade bajo"></textarea></div>
+              <div class="booking-summary" id="bookingSummary"></div>
+              <div class="booking-actions form-actions">
+                <button class="btn ghost small back-btn" type="button" data-back="3">Atrás</button>
+                <button class="btn primary" type="submit">Confirmar reserva</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="booking-step" id="stepSuccess">
+            <div class="success-box">
+              <div class="success-icon">✓</div>
+              <span class="eyebrow">RESERVA CONFIRMADA</span>
+              <h3>Nos vemos pronto.</h3>
+              <p id="successText"></p>
+              <button class="btn primary" id="newBookingBtn">Hacer otra reserva</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact-section">
+      <div>
+        <span class="eyebrow">NOIR & GOLD</span>
+        <h2>Más que un corte.<br/><em>Una experiencia.</em></h2>
+      </div>
+      <div class="contact-cards">
+        <div><small>UBICACIÓN</small><b>San José, Costa Rica</b><span>Dirección de ejemplo</span></div>
+        <div><small>CONTACTO</small><b>+506 8888-8888</b><span>WhatsApp disponible</span></div>
+        <div><small>HORARIO BASE</small><b>Lun – Sáb</b><span>9:00 a.m. – 7:00 p.m.</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>© 2026 Noir & Gold Barbershop</span><span>Booking system demo</span></footer>
+
+  <!-- Admin modal -->
+  <div class="modal" id="adminModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-admin></div>
+    <div class="admin-window">
+      <button class="modal-close" data-close-admin>×</button>
+      <div id="adminLogin" class="admin-login">
+        <span class="eyebrow">ACCESO PRIVADO</span>
+        <h2>Panel del dueño</h2>
+        <p>Administra agenda, equipo y horarios especiales.</p>
+        <div class="field"><label>Contraseña demo</label><input id="adminPassword" type="password" placeholder="••••••••" /></div>
+        <button class="btn primary full-btn" id="adminLoginBtn">Entrar</button>
+        <small class="demo-hint">Demo: <b>barber2026</b></small>
+        <p class="error" id="loginError"></p>
+      </div>
+
+      <div id="adminDashboard" class="admin-dashboard hidden">
+        <div class="admin-topbar">
+          <div><span class="eyebrow">NOIR & GOLD</span><h2>Panel de control</h2></div>
+          <button class="btn ghost small" id="adminLogoutBtn">Salir</button>
+        </div>
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-tab="appointments">Citas</button>
+          <button class="admin-tab" data-tab="team">Equipo del día</button>
+          <button class="admin-tab" data-tab="hours">Horarios</button>
+        </div>
+
+        <section class="admin-pane active" id="pane-appointments">
+          <div class="admin-toolbar">
+            <div><h3>Agenda</h3><p>Revisa, confirma o cancela reservas.</p></div>
+            <input id="adminDateFilter" type="date" />
+          </div>
+          <div class="metric-row" id="metricRow"></div>
+          <div class="appointments-list" id="appointmentsList"></div>
+        </section>
+
+        <section class="admin-pane" id="pane-team">
+          <div class="admin-toolbar">
+            <div><h3>Quién trabaja ese día</h3><p>El cliente solo verá barberos marcados como disponibles.</p></div>
+            <input id="staffDate" type="date" />
+          </div>
+          <div class="staff-toggle-list" id="staffToggleList"></div>
+          <button class="btn primary" id="saveStaffDay">Guardar equipo del día</button>
+          <p class="save-status" id="staffSaveStatus"></p>
+        </section>
+
+        <section class="admin-pane" id="pane-hours">
+          <div class="admin-columns">
+            <div class="admin-card">
+              <h3>Horario general</h3>
+              <p>Se usa por defecto cada semana.</p>
+              <div id="weeklyHours"></div>
+              <button class="btn primary" id="saveWeeklyHours">Guardar horario general</button>
+              <p class="save-status" id="weeklySaveStatus"></p>
+            </div>
+            <div class="admin-card">
+              <h3>Excepción por fecha</h3>
+              <p>Cambia solo un día sin alterar el horario general.</p>
+              <div class="field"><label>Fecha</label><input id="specialDate" type="date" /></div>
+              <label class="switch-row"><input id="specialClosed" type="checkbox"/><span>Día cerrado</span></label>
+              <div class="inline-fields" id="specialTimeFields">
+                <div class="field"><label>Abre</label><input id="specialOpen" type="time" value="09:00" /></div>
+                <div class="field"><label>Cierra</label><input id="specialClose" type="time" value="19:00" /></div>
+              </div>
+              <div class="admin-actions-row">
+                <button class="btn primary" id="saveSpecialHours">Guardar excepción</button>
+                <button class="btn ghost" id="removeSpecialHours">Eliminar</button>
+              </div>
+              <p class="save-status" id="specialSaveStatus"></p>
+              <div class="exceptions-list" id="exceptionsList"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
