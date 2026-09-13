@@ -1,8 +1,8 @@
 import Script from "next/script";
 
 export const metadata = {
-  title: "NOIR & GOLD Barbershop | Reservas",
-  description: "Reserva tu cita en NOIR & GOLD Barbershop."
+  title: "Guzman Barber Shop | Reservas",
+  description: "Reserva tu cita en Guzman Barber Shop."
 };
 
 export default function RootLayout({ children }) {
