@@ -43,17 +43,15 @@ git push
 ```
 
 ## Publicar en Vercel
-
 1. Entra a Vercel.
 2. Add New > Project.
 3. Importa el repositorio de GitHub.
-4. Framework Preset: `Other`.
+4. Framework Preset: `Next.js` (se detecta automáticamente).
 5. Root Directory: déjalo en la raíz del repositorio.
-6. Build Command: vacío.
-7. Output Directory: vacío.
-8. Pulsa Deploy.
-
-Vercel detectará `index.html` directamente.
+6. Build Command: `next build` (por defecto).
+7. Output Directory: `.next` (por defecto).
+8. Agrega las variables de entorno de WhatsApp (opcional, ver más abajo).
+9. Pulsa Deploy.
 
 ## Actualizaciones automáticas
 
@@ -93,13 +91,19 @@ Para producción hay que conectar una base de datos central (recomendado: Supaba
 
 La estructura de esta versión está lista para publicarse primero en Vercel y después migrar la persistencia a Supabase.
 
-## Archivos
+## Estructura del proyecto
+Es un proyecto **Next.js** (App Router). El markup de la app vive una sola vez en `app/content/index.html` y se inyecta desde las páginas; los assets estáticos están en `public/`.
 
 ```text
-index.html
-styles.css
-app.js
-vercel.json
-.gitignore
-README.md
+app/
+  content/index.html   markup de la app (landing + reserva + modal admin)
+  page.js              ruta / (reserva)
+  admin/page.js        ruta /admin (panel del dueño)
+  layout.js            layout raíz
+  api/notify/route.js  notificación por WhatsApp
+lib/legacy.js          helper que extrae el markup
+public/
+  app.js               lógica del cliente
+  styles.css           estilos
+  logo.png / logo.jpg  assets
 ```
