@@ -15,11 +15,23 @@ Web responsive de reservas para barbería premium, preparada para publicarse des
 - Gestión y cancelación de citas.
 - Responsive para celular y computadora.
 
-## Demo del panel
+## Login del panel de administración
 
-Contraseña temporal: `barber2026`
+El panel `/admin` usa un login real del lado del servidor: la contraseña se guarda hasheada (scrypt, nunca en texto plano) y la sesión es una cookie firmada `httpOnly` que el navegador no puede leer ni falsificar desde la consola. Incluye límite de intentos por IP y verificación de origen.
 
-> Esta contraseña es solo para la demo frontend. No se debe usar así en producción.
+Para configurarlo:
+
+```bash
+npm run hash-password
+```
+
+Copiá la línea `ADMIN_PASSWORD_HASH=...` que imprime el comando a tu `.env.local` (y a las variables de entorno de Vercel). Después generá el secreto de sesión:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Copiá el resultado como `SESSION_SECRET` (también en `.env.local` y en Vercel). Sin estas dos variables el login queda deshabilitado (`503`). Sesiones expiran a las 8 horas. Si cambiás la contraseña, generá un hash nuevo y reemplazá `ADMIN_PASSWORD_HASH`; no hay forma de "recuperarla" porque no se guarda en texto plano.
 
 ## Subir a GitHub desde CMD / PowerShell
 
@@ -81,13 +93,13 @@ WHATSAPP_OWNER_PHONE=506XXXXXXXX
 
 El número debe estar en formato internacional, sin `+`, espacios ni guiones. Crea una app de WhatsApp Business en Meta, agrega el número de prueba o producción y copia su token permanente y Phone Number ID. Sin estas variables, la reserva se guarda localmente pero no se envía ninguna notificación.
 
-Para producción hay que conectar una base de datos central (recomendado: Supabase) para que:
+El login del panel ya es real y seguro (ver arriba), pero las citas, el equipo y los horarios siguen guardándose solo en `localStorage`. Para producción conviene conectar una base de datos central (recomendado: Supabase) para que:
 
 - una cita creada por un cliente aparezca en el panel del dueño;
 - varios clientes compartan la misma disponibilidad;
-- el dueño pueda entrar desde cualquier dispositivo;
-- exista autenticación real y segura;
-- los horarios y barberos se guarden centralmente.
+- el dueño pueda entrar desde cualquier dispositivo y ver las mismas citas;
+- los horarios y barberos se guarden centralmente;
+- se puedan automatizar recordatorios (por ejemplo, por WhatsApp) según la fecha real de cada cita.
 
 La estructura de esta versión está lista para publicarse primero en Vercel y después migrar la persistencia a Supabase.
 
@@ -96,12 +108,16 @@ Es un proyecto **Next.js** (App Router). El markup de la app vive una sola vez e
 
 ```text
 app/
-  content/index.html   markup de la app (landing + reserva + modal admin)
-  page.js              ruta / (reserva)
-  admin/page.js        ruta /admin (panel del dueño)
-  layout.js            layout raíz
-  api/notify/route.js  notificación por WhatsApp
-lib/legacy.js          helper que extrae el markup
+  content/index.html         markup de la app (landing + reserva + modal admin)
+  page.js                    ruta / (reserva)
+  admin/page.js               ruta /admin (panel del dueño; valida la sesión en el servidor)
+  layout.js                   layout raíz
+  api/notify/route.js         notificación por WhatsApp al dueño
+  api/admin/login/route.js    login: verifica contraseña, límite de intentos, crea la cookie de sesión
+  api/admin/logout/route.js   borra la cookie de sesión
+lib/legacy.js                 helper que extrae el markup
+lib/auth.js                   hash de contraseña, firma/verificación de sesión, límite de intentos
+scripts/hash-password.js      genera ADMIN_PASSWORD_HASH de forma interactiva
 public/
   app.js               lógica del cliente
   styles.css           estilos

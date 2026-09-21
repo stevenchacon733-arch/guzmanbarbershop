@@ -114,12 +114,27 @@ function initBookingEvents(){
 
 function openAdmin(){ $('#adminModal').classList.add('open');document.body.classList.add('modal-open');$('#adminModal').setAttribute('aria-hidden','false'); }
 function closeAdmin(){ $('#adminModal').classList.remove('open');document.body.classList.remove('modal-open');$('#adminModal').setAttribute('aria-hidden','true'); }
-function showDashboard(){ $('#adminLogin').classList.add('hidden');$('#adminDashboard').classList.remove('hidden'); sessionStorage.setItem('ng_admin','1'); initAdminViews(); }
-function logoutAdmin(){sessionStorage.removeItem('ng_admin');$('#adminDashboard').classList.add('hidden');$('#adminLogin').classList.remove('hidden');$('#adminPassword').value=''}
+function showDashboard(){ $('#adminLogin').classList.add('hidden');$('#adminDashboard').classList.remove('hidden'); initAdminViews(); }
+async function logoutAdmin(){
+  try{await fetch('/api/admin/logout',{method:'POST'})}catch{}
+  $('#adminDashboard').classList.add('hidden');$('#adminLogin').classList.remove('hidden');$('#adminPassword').value='';
+}
+async function attemptLogin(){
+  const btn=$('#adminLoginBtn'); const password=$('#adminPassword').value;
+  if(!password){$('#loginError').textContent='Ingresá la contraseña.';return}
+  btn.disabled=true; $('#loginError').textContent='';
+  try{
+    const res=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})});
+    const data=await res.json().catch(()=>({}));
+    if(res.ok){ $('#adminPassword').value=''; showDashboard(); }
+    else{ $('#loginError').textContent=data.error||'Contraseña incorrecta.'; }
+  }catch{ $('#loginError').textContent='No se pudo conectar. Intentá de nuevo.'; }
+  finally{ btn.disabled=false; }
+}
 
 function initAdmin(){
   const adminOpen=$('#adminOpenBtn'); if(adminOpen)adminOpen.onclick=openAdmin; $$('[data-close-admin]').forEach(x=>x.onclick=closeAdmin);
-  $('#adminLoginBtn').onclick=()=>{if($('#adminPassword').value==='barber2026'){ $('#loginError').textContent='';showDashboard(); }else $('#loginError').textContent='Contraseña incorrecta.'};
+  $('#adminLoginBtn').onclick=attemptLogin;
   $('#adminPassword').addEventListener('keydown',e=>{if(e.key==='Enter')$('#adminLoginBtn').click()}); $('#adminLogoutBtn').onclick=logoutAdmin;
   $$('.admin-tab').forEach(tab=>tab.onclick=()=>{$$('.admin-tab').forEach(x=>x.classList.remove('active'));tab.classList.add('active');$$('.admin-pane').forEach(x=>x.classList.remove('active'));$(`#pane-${tab.dataset.tab}`).classList.add('active');if(tab.dataset.tab==='appointments')renderAppointments();if(tab.dataset.tab==='team')renderStaffDay();if(tab.dataset.tab==='hours'){renderWeeklyHours();renderExceptions();}});
   $('#adminDateFilter').onchange=renderAppointments; $('#staffDate').onchange=renderStaffDay;
@@ -157,4 +172,4 @@ function initNavAndReveal(){
 }
 
 renderServices();renderBarbers();initBookingEvents();initAdmin();initNavAndReveal();
-if(sessionStorage.getItem('ng_admin')==='1'){ $('#adminLogin').classList.add('hidden');$('#adminDashboard').classList.remove('hidden'); }
+if(document.getElementById('adminAuthFlag')?.dataset.authenticated==='true'){ showDashboard(); }

@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "hash-password": "node scripts/hash-password.js"
   },
   "dependencies": {
     "next": "15.5.24",
