@@ -2,7 +2,8 @@ const STORE = {
   appointments: 'ng_appointments_v1',
   staffByDate: 'ng_staff_by_date_v1',
   weeklyHours: 'ng_weekly_hours_v1',
-  specialHours: 'ng_special_hours_v1'
+  specialHours: 'ng_special_hours_v1',
+  clientPhone: 'ng_client_phone_v1'
 };
 
 const services = [
@@ -26,7 +27,7 @@ const defaultWeekly = {
   6:{closed:false,open:'09:00',close:'18:00'}
 };
 
-const state = { step:1, service:null, date:null, barber:null, time:null };
+const state = { step:'login', service:null, date:null, barber:null, time:null, clientPhone:null };
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const money = n => new Intl.NumberFormat('es-CR',{style:'currency',currency:'CRC',maximumFractionDigits:0}).format(n);
 const dateKey = d => { const x=new Date(d); const y=x.getFullYear(); const m=String(x.getMonth()+1).padStart(2,'0'); const day=String(x.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; };
@@ -38,6 +39,11 @@ const getAppointments = () => load(STORE.appointments,[]);
 const getWeeklyHours = () => load(STORE.weeklyHours,defaultWeekly);
 const getSpecialHours = () => load(STORE.specialHours,{});
 const getStaffByDate = () => load(STORE.staffByDate,{});
+const getClientPhone = () => { try{return localStorage.getItem(STORE.clientPhone)||null}catch{return null} };
+const setClientPhone = phone => { try{localStorage.setItem(STORE.clientPhone,phone)}catch{} };
+const clearClientPhone = () => { try{localStorage.removeItem(STORE.clientPhone)}catch{} };
+const isValidPhone = digits => /^[2-8][0-9]{7}$/.test(digits);
+const formatPhone = digits => digits && digits.length===8 ? `${digits.slice(0,4)}-${digits.slice(4)}` : digits;
 
 function hoursForDate(key){
   const special=getSpecialHours()[key];
@@ -61,7 +67,7 @@ function renderBarbers(){
 function setStep(n){
   state.step=n;
   $$('.booking-step').forEach(el=>el.classList.remove('active'));
-  const target = n==='success' ? $('#stepSuccess') : $(`#step${n}`); target.classList.add('active');
+  const target = n==='success' ? $('#stepSuccess') : n==='login' ? $('#stepLogin') : $(`#step${n}`); target.classList.add('active');
   $$('.progress-step').forEach(el=>{const sn=Number(el.dataset.step);el.classList.toggle('active',sn===n);el.classList.toggle('done',typeof n==='number'&&sn<n)});
   if(n===2) renderDates(); if(n===3) renderBookingBarbers(); if(n===4) renderTimesAndSummary();
   document.querySelector('#booking').scrollIntoView({behavior:'smooth',block:'start'});
@@ -103,12 +109,41 @@ function renderSummary(){
   const s=services.find(x=>x.id===state.service), b=barbers.find(x=>x.id===state.barber);
   $('#bookingSummary').innerHTML=`<div class="summary-item"><small>Servicio</small><b>${s?.name||'—'}</b></div><div class="summary-item"><small>Fecha</small><b>${state.date?prettyDate(state.date):'—'}</b></div><div class="summary-item"><small>Barbero</small><b>${b?.name||'—'}</b></div><div class="summary-item"><small>Hora</small><b>${state.time||'Selecciona arriba'}</b></div>`;
 }
-function resetBooking(){Object.assign(state,{step:1,service:null,date:null,barber:null,time:null});$('#bookingForm').reset();setStep(1);$$('[data-service]').forEach(x=>x.classList.remove('selected'))}
+function resetBooking(){Object.assign(state,{step:1,service:null,date:null,barber:null,time:null});$('#bookingForm').reset();$('#clientPhone').value=state.clientPhone||'';$('#clientPhone').readOnly=true;setStep(1);$$('[data-service]').forEach(x=>x.classList.remove('selected'))}
+
+function updateClientSessionBar(){
+  const bar=$('#clientSession'); if(!bar)return;
+  if(state.clientPhone){ bar.classList.remove('hidden'); $('#clientSessionPhone').textContent=formatPhone(state.clientPhone); }
+  else{ bar.classList.add('hidden'); }
+}
+function attemptClientLogin(){
+  const digits=$('#loginPhone').value.replace(/\D/g,'');
+  if(!isValidPhone(digits)){ $('#loginPhoneError').textContent='Ingresá un número de teléfono válido (8 dígitos).'; return; }
+  setClientPhone(digits); state.clientPhone=digits;
+  $('#loginPhoneError').textContent=''; $('#loginPhone').value='';
+  $('#clientPhone').value=digits; $('#clientPhone').readOnly=true;
+  updateClientSessionBar();
+  setStep(1);
+}
+function clientLogout(){
+  clearClientPhone(); state.clientPhone=null;
+  $('#clientPhone').value=''; $('#clientPhone').readOnly=true;
+  Object.assign(state,{service:null,date:null,barber:null,time:null});
+  $('#bookingForm').reset();
+  $$('[data-service]').forEach(x=>x.classList.remove('selected'));
+  updateClientSessionBar();
+  setStep('login');
+}
+function initClientLogin(){
+  $('#clientLoginBtn').onclick=attemptClientLogin;
+  $('#loginPhone').addEventListener('keydown',e=>{if(e.key==='Enter')attemptClientLogin()});
+  $('#clientLogoutBtn').onclick=clientLogout;
+}
 
 function initBookingEvents(){
   $$('[data-service]').forEach(btn=>btn.onclick=()=>{state.service=btn.dataset.service;state.date=null;state.barber=null;state.time=null;$$('[data-service]').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');setTimeout(()=>setStep(2),180)});
   $$('.back-btn').forEach(btn=>btn.onclick=()=>setStep(Number(btn.dataset.back)));
-  $('#bookingForm').onsubmit=async e=>{e.preventDefault();if(!state.time){showToast('Selecciona una hora disponible.');return} const submit=e.submitter;submit.disabled=true; const s=services.find(x=>x.id===state.service),b=barbers.find(x=>x.id===state.barber); const appointment={id:'APT-'+Date.now(),createdAt:new Date().toISOString(),serviceId:s.id,serviceName:s.name,price:s.price,duration:s.duration,date:state.date,time:state.time,barberId:b.id,barberName:b.name,clientName:$('#clientName').value.trim(),phone:$('#clientPhone').value.trim(),email:$('#clientEmail').value.trim(),note:$('#clientNote').value.trim(),status:'confirmed'}; const arr=getAppointments();arr.push(appointment);save(STORE.appointments,arr); try{const response=await fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(appointment)});if(!response.ok)showToast('Reserva guardada; no se pudo avisar por WhatsApp.')}catch{showToast('Reserva guardada; WhatsApp no está configurado.')} finally{submit.disabled=false} $('#successText').textContent=`${appointment.clientName}, tu cita quedó para ${prettyDate(appointment.date)} a las ${appointment.time} con ${appointment.barberName}.`;setStep('success');};
+  $('#bookingForm').onsubmit=async e=>{e.preventDefault();if(!state.clientPhone){showToast('Iniciá sesión con tu número para reservar.');setStep('login');return} if(!state.time){showToast('Selecciona una hora disponible.');return} const submit=e.submitter;submit.disabled=true; const s=services.find(x=>x.id===state.service),b=barbers.find(x=>x.id===state.barber); const appointment={id:'APT-'+Date.now(),createdAt:new Date().toISOString(),serviceId:s.id,serviceName:s.name,price:s.price,duration:s.duration,date:state.date,time:state.time,barberId:b.id,barberName:b.name,clientName:$('#clientName').value.trim(),phone:state.clientPhone,email:$('#clientEmail').value.trim(),note:$('#clientNote').value.trim(),status:'confirmed'}; const arr=getAppointments();arr.push(appointment);save(STORE.appointments,arr); try{const response=await fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(appointment)});if(!response.ok)showToast('Reserva guardada; no se pudo avisar por WhatsApp.')}catch{showToast('Reserva guardada; WhatsApp no está configurado.')} finally{submit.disabled=false} $('#successText').textContent=`${appointment.clientName}, tu cita quedó para ${prettyDate(appointment.date)} a las ${appointment.time} con ${appointment.barberName}.`;setStep('success');};
   $('#newBookingBtn').onclick=resetBooking;
 }
 
@@ -171,5 +206,12 @@ function initNavAndReveal(){
   const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.12}); $$('.reveal').forEach(el=>obs.observe(el));
 }
 
-renderServices();renderBarbers();initBookingEvents();initAdmin();initNavAndReveal();
+renderServices();renderBarbers();initBookingEvents();initClientLogin();initAdmin();initNavAndReveal();
+const savedPhone=getClientPhone();
+if(savedPhone){
+  state.clientPhone=savedPhone; state.step=1;
+  $('#stepLogin').classList.remove('active'); $('#step1').classList.add('active');
+  $('#clientPhone').value=savedPhone; $('#clientPhone').readOnly=true;
+}
+updateClientSessionBar();
 if(document.getElementById('adminAuthFlag')?.dataset.authenticated==='true'){ showDashboard(); }

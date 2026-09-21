@@ -86,7 +86,20 @@
         </aside>
 
         <div class="booking-content">
-          <div class="booking-step active" id="step1">
+          <div class="client-session hidden" id="clientSession">
+            <span>Ingresando como <b id="clientSessionPhone"></b></span>
+            <button type="button" class="btn ghost small" id="clientLogoutBtn">Cambiar número</button>
+          </div>
+
+          <div class="booking-step active" id="stepLogin">
+            <div class="step-title"><span>Acceso</span><h3>Ingresá tu número para agendar</h3></div>
+            <p class="login-hint">Usamos tu número de WhatsApp para identificarte en tu reserva. No enviamos códigos ni mensajes automáticos.</p>
+            <div class="field"><label>WhatsApp / teléfono</label><input id="loginPhone" required inputmode="tel" placeholder="8888-8888" /></div>
+            <p class="error" id="loginPhoneError"></p>
+            <div class="booking-actions"><button class="btn primary" type="button" id="clientLoginBtn">Continuar</button></div>
+          </div>
+
+          <div class="booking-step" id="step1">
             <div class="step-title"><span>Paso 1</span><h3>Selecciona un servicio</h3></div>
             <div class="choice-grid" id="bookingServices"></div>
           </div>
@@ -109,7 +122,7 @@
             <div class="slots" id="timeSlots"></div>
             <form id="bookingForm" class="booking-form">
               <div class="field"><label>Nombre completo</label><input id="clientName" required placeholder="Ej. Daniel Mora" /></div>
-              <div class="field"><label>WhatsApp / teléfono</label><input id="clientPhone" required inputmode="tel" placeholder="8888-8888" /></div>
+              <div class="field"><label>WhatsApp / teléfono <span>(tu número de acceso)</span></label><input id="clientPhone" required inputmode="tel" placeholder="8888-8888" readonly /></div>
               <div class="field"><label>Correo <span>(opcional)</span></label><input id="clientEmail" type="email" placeholder="correo@ejemplo.com" /></div>
               <div class="field full"><label>Nota <span>(opcional)</span></label><textarea id="clientNote" rows="3" placeholder="Ej. Prefiero fade bajo"></textarea></div>
               <div class="booking-summary" id="bookingSummary"></div>

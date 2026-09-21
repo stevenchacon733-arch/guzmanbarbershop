@@ -5,6 +5,7 @@ Web responsive de reservas para barbería premium, preparada para publicarse des
 ## Funciones incluidas
 
 - Landing page premium negro/café/dorado.
+- Acceso de clientes por número de teléfono antes de reservar.
 - Reserva en 4 pasos: servicio, fecha, barbero y hora.
 - Cálculo de disponibilidad según duración del servicio.
 - Evita cruces de citas.
@@ -32,6 +33,10 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 Copiá el resultado como `SESSION_SECRET` (también en `.env.local` y en Vercel). Sin estas dos variables el login queda deshabilitado (`503`). Sesiones expiran a las 8 horas. Si cambiás la contraseña, generá un hash nuevo y reemplazá `ADMIN_PASSWORD_HASH`; no hay forma de "recuperarla" porque no se guarda en texto plano.
+
+## Acceso de clientes por teléfono
+
+Antes de agendar, el cliente debe ingresar su número de WhatsApp/teléfono. No se verifica con un código (no hay SMS ni WhatsApp OTP): es solo un identificador que queda guardado en `localStorage` de ese navegador, así que cualquiera puede escribir cualquier número — no es un login seguro, solo evita reservas completamente anónimas y deja el teléfono fijo (no editable) en el formulario de reserva. Al volver a entrar desde el mismo navegador, queda "logueado" automáticamente; "Cambiar número" lo borra. Si más adelante se quiere verificar el número de verdad (código OTP) y que el cliente pueda ver sus citas desde otro dispositivo, hace falta migrar a una base de datos central (ver siguiente sección) y agregar un proveedor de verificación (Twilio Verify o plantilla de WhatsApp Business).
 
 ## Subir a GitHub desde CMD / PowerShell
 
