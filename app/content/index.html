@@ -77,7 +77,7 @@
         <p>Selecciona servicio, fecha, barbero y hora. La agenda bloquea automáticamente espacios ocupados.</p>
       </div>
 
-      <div class="booking-shell reveal">
+      <div class="booking-shell reveal pre-auth">
         <aside class="booking-progress">
           <div class="progress-step active" data-step="1"><span>01</span><div><b>Servicio</b><small>Qué quieres hacerte</small></div></div>
           <div class="progress-step" data-step="2"><span>02</span><div><b>Fecha</b><small>Cuándo quieres venir</small></div></div>
@@ -91,12 +91,17 @@
             <button type="button" class="btn ghost small" id="clientLogoutBtn">Cambiar número</button>
           </div>
 
-          <div class="booking-step active" id="stepLogin">
-            <div class="step-title"><span>Acceso</span><h3>Ingresá tu número para agendar</h3></div>
-            <p class="login-hint">Usamos tu número de WhatsApp para identificarte en tu reserva. No enviamos códigos ni mensajes automáticos.</p>
-            <div class="field"><label>WhatsApp / teléfono</label><input id="loginPhone" required inputmode="tel" placeholder="8888-8888" /></div>
-            <p class="error" id="loginPhoneError"></p>
-            <div class="booking-actions"><button class="btn primary" type="button" id="clientLoginBtn">Continuar</button></div>
+          <div class="booking-step active login-screen" id="stepLogin">
+            <div class="login-card">
+              <span class="login-mark"><img src="/logo.png" alt="" onerror="this.hidden=true" />G</span>
+              <h2>Ingresá a Guzman Barber Shop</h2>
+              <p class="login-hint">Usamos tu número de WhatsApp para identificarte en tu reserva. No enviamos códigos ni mensajes automáticos.</p>
+              <div class="login-form">
+                <input id="loginPhone" required inputmode="tel" placeholder="WhatsApp o teléfono, ej. 8888-8888" />
+                <p class="error" id="loginPhoneError"></p>
+                <button class="btn primary full-btn" type="button" id="clientLoginBtn">Continuar</button>
+              </div>
+            </div>
           </div>
 
           <div class="booking-step" id="step1">

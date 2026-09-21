@@ -68,6 +68,7 @@ function setStep(n){
   state.step=n;
   $$('.booking-step').forEach(el=>el.classList.remove('active'));
   const target = n==='success' ? $('#stepSuccess') : n==='login' ? $('#stepLogin') : $(`#step${n}`); target.classList.add('active');
+  $('.booking-shell').classList.toggle('pre-auth', n==='login');
   $$('.progress-step').forEach(el=>{const sn=Number(el.dataset.step);el.classList.toggle('active',sn===n);el.classList.toggle('done',typeof n==='number'&&sn<n)});
   if(n===2) renderDates(); if(n===3) renderBookingBarbers(); if(n===4) renderTimesAndSummary();
   document.querySelector('#booking').scrollIntoView({behavior:'smooth',block:'start'});
@@ -211,6 +212,7 @@ const savedPhone=getClientPhone();
 if(savedPhone){
   state.clientPhone=savedPhone; state.step=1;
   $('#stepLogin').classList.remove('active'); $('#step1').classList.add('active');
+  $('.booking-shell').classList.remove('pre-auth');
   $('#clientPhone').value=savedPhone; $('#clientPhone').readOnly=true;
 }
 updateClientSessionBar();
